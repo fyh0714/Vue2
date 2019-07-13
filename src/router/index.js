@@ -26,7 +26,7 @@ const router = new VueRouter({
     { name: '404', path: '*', component: NotFound }
   ]
 })
-// 添加前置守卫
+// 添加前置守卫!
 router.beforeEach((to, from, next) => {
   if (to.path === '/login') return next()
   const user = window.sessionStorage.getItem('hm74-toutiao')
