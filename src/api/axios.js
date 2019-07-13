@@ -25,4 +25,12 @@ instance.interceptors.request.use(config => {
   // new promise():可能是成功的可能是失败的
   return Promise.reject(error)
 })
+
+// 响应拦截
+instance.interceptors.response.use(response => response, error => {
+  if (error.response.status === 401) {
+    location.hash = '#/login'
+  }
+  return Promise.reject(error)
+})
 export default instance
