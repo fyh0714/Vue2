@@ -47,15 +47,15 @@
       <el-header class="my-header">
         <span class="el-icon-s-fold" @click="toggleMenu"></span>
         <span class="text">江苏传智播客科技教育有限公司</span>
-        <el-dropdown style="float:right">
+        <el-dropdown style="float:right" @command="handleCommand">
           <span class="el-dropdown-link">
             <img style="vertical-align:middle" width="30" height="30" :src="avatar" alt="">
             <b style="vertical-align:middle;padding-left:5px">{{name}}</b>
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item icon="el-icon-setting" @click.native="setting()">个人设置</el-dropdown-item>
-            <el-dropdown-item icon="el-icon-unlock" @click.native="logout()">推出登录</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-setting" command="setting">个人设置</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-unlock" command="logout">推出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </el-header>
@@ -90,7 +90,8 @@ export default {
     // 3.组件解析过后 这个标签是不存在 事件绑定无效
     // 4.事件修饰符：@click.prevent 阻止浏览器默认行为 @click.native 绑定原生事件
     // 产生的问题：给组件自定义标签绑定DOM原生事件，该事件绑定无效
-    // 解决：利用事件修饰符 @click.native绑定原生事件
+    // 解决：1.利用事件修饰符 @click.native绑定原生事件
+    //      2.element-ul文档中提供的方法
     setting () {
       this.$router.push('/setting')
     },
@@ -98,6 +99,12 @@ export default {
       // 清除sessionStorage中的hm74-toutiao
       window.sessionStorage.removeItem('hm74-toutiao')
       this.$router.push('/login')
+    },
+    handleCommand (command) {
+      // command就是点击的选项中的command的值 setting/login
+      this[command]()
+      // command === setting ===> this.setting
+      // command === logout ===> this.logout
     }
   }
 }
