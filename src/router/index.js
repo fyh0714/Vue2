@@ -11,6 +11,7 @@ import Welcome from '../views/welcome'
 
 import NotFound from '../views/404'
 
+import Article from '../views/article'
 Vue.use(VueRouter)
 
 const router = new VueRouter({
@@ -20,7 +21,8 @@ const router = new VueRouter({
       path: '/',
       component: Home,
       children: [
-        { name: 'welcome', path: '/', component: Welcome }
+        { name: 'welcome', path: '/', component: Welcome },
+        { name: 'article', path: '/article', component: Article }
       ]
     },
     { name: '404', path: '*', component: NotFound }
