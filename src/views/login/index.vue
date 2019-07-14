@@ -3,7 +3,7 @@
         <el-card class="login-box">
             <img src="../../assets/images/logo_index.png" alt="">
             <!-- 登录表单 -->
-            <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
+            <el-form ref="loginForm" :status-icon="true" :model="loginForm" :rules="loginRules">
                 <el-form-item prop="mobile">
                     <el-input v-model="loginForm.mobile" placeholder="请输入手机号"></el-input>
                 </el-form-item>
@@ -56,26 +56,39 @@ export default {
   },
   methods: {
     login () {
-      this.$refs.loginForm.validate((valid) => {
-        if (valid) {
-          // 提交登录请求，axios是基于promise封装的 post() 返回值一个promise对象
-          this.$http.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm)
-            .then((res) => {
-              // res是响应对象 包含后台返回的数据 res.data
-              // 1.登录成功跳转到首页
-              // 2.TODO 保存用户的信息 用来判断登录状态
-              // sessionStorage BOM对象 全局对象 作用：保存数据，特点：有有效期，关闭浏览器后失效
-              // sessionStorage.setItem(key,value) 存储数据 value必须是字符串
-              // sessionStorage.getItem(key) 获取数据
-              // sessionStorage.removeItem(key) 删除数据
-              // sessionStorage.clear() 清空所有的数据
-              window.sessionStorage.setItem('hm74-toutiao', JSON.stringify(res.data.data))
-              this.$router.push('/')
-            }).catch(() => {
-              // 提示
+      // this.$refs.loginForm.validate((valid) => {
+      //   if (valid) {
+      //     // 提交登录请求，axios是基于promise封装的 post() 返回值一个promise对象
+      //     this.$http.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm)
+      //       .then((res) => {
+      //         // res是响应对象 包含后台返回的数据 res.data
+      //         // 1.登录成功跳转到首页
+      //         // 2.TODO 保存用户的信息 用来判断登录状态
+      //         // sessionStorage BOM对象 全局对象 作用：保存数据，特点：有有效期，关闭浏览器后失效
+      //         // sessionStorage.setItem(key,value) 存储数据 value必须是字符串
+      //         // sessionStorage.getItem(key) 获取数据
+      //         // sessionStorage.removeItem(key) 删除数据
+      //         // sessionStorage.clear() 清空所有的数据
+      //         window.sessionStorage.setItem('hm74-toutiao', JSON.stringify(res.data.data))
+      //         this.$router.push('/')
+      //       }).catch(() => {
+      //         // 提示
 
-              this.$message.error('手机号或验证码错误')
-            })
+      //         this.$message.error('手机号或验证码错误')
+      //       })
+      //   }
+      // })
+      this.$refs.loginForm.validate(async valid => {
+        if (valid) {
+          // 发请求 promise对象 给你发请求
+          // try{业务逻辑}catch(err){处理异常}
+          try {
+            const res = await this.$http.post('authorizations', this.loginForm)
+            window.sessionStorage.setItem('hm74-toutiao', JSON.stringify(res.data.data))
+            this.$router.push('/')
+          } catch (err) {
+            this.$message.error('手机号或验证码错误')
+          }
         }
       })
     }
