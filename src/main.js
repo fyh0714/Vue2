@@ -12,6 +12,10 @@ import router from '@/router'
 
 import axios from '@/api/axios.js'
 
+import components from '@/components'
+
+Vue.use(components)
+
 Vue.prototype.$http = axios
 
 Vue.use(ELEMENT)
