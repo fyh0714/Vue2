@@ -48,7 +48,8 @@
       <my-test>
         <!-- scope 收集了该插槽上所有的自定义属性的数据 -->
         <!-- scope 是一个对象包含了插槽上的所有数据 -->
-        <template slot="content" slot-scope="scope">内容1 {{scope.test}}</template>
+        <!-- <template slot="content" slot-scope="scope">内容1 {{scope.test}}</template> -->
+        <template v-slot:content="scope">内容1 {{scope.test}}</template>
         <template slot="footer">底部1</template>
       </my-test>
     </el-card>
