@@ -1,9 +1,15 @@
 // 配置axios
 import axios from 'axios'
 
+import JSONBing from 'json-bigint'
+
 const instance = axios.create({
   // 配置对象 基准路径 头部信息
-  baseURL: 'http://ttapi.research.itcast.cn/mp/v1_0/'
+  baseURL: 'http://ttapi.research.itcast.cn/mp/v1_0/',
+  transformResponse: [(data) => {
+    // 对data进行任意转换处理
+    return JSONBing.parse(data)
+  }]
 //   headers: {
 //     Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('hm74-toutiao')).token
 //   }
