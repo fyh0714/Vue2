@@ -1,12 +1,12 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <el-card>
       <div slot="header">
         <my-bread>素材管理</my-bread>
       </div>
       <div style="margin-bottom:20px">
         <!-- 按钮式的单选框 -->
-        <el-radio-group size="small" v-model="reqParams.collect">
+        <el-radio-group size="small" @change="search()" v-model="reqParams.collect">
           <el-radio-button :label="false">全部</el-radio-button>
           <el-radio-button :label="true">收藏</el-radio-button>
         </el-radio-group>
@@ -15,15 +15,15 @@
       </div>
       <!-- 图片列表 -->
       <ul class="img-list">
-        <li v-for="item in 10" :key="item">
-          <img src="../../assets/images/avatar.jpg" alt />
-          <div class="fot">
-            <span class="el-icon-star-off" :class="{red:item%2}"></span>
+        <li v-for="item in images" :key="item.id">
+          <img :src="item.url" alt />
+          <div class="fot" v-if="!reqParams.collect">
+            <span class="el-icon-star-off" :class="{red:item.is_collected}"></span>
             <span class="el-icon-delete"></span>
           </div>
         </li>
       </ul>
-      <el-pagination background layout="prev, pager, next" :total="1000"></el-pagination>
+      <el-pagination v-if="total>reqParams.per_page" background layout="prev, pager, next" :total="total" :page-size="reqParams.per_page" :current-page="reqParams.page" @current-change="pager"></el-pagination>
     </el-card>
   </div>
 </template>
@@ -34,8 +34,40 @@ export default {
     return {
       // 参数对象
       reqParams: {
-        collect: false
-      }
+        collect: false,
+        page: 1,
+        per_page: 10
+      },
+      // 素材列表
+      images: [],
+      // 加载数据
+      loading: false,
+      // 总条数
+      total: 0
+    }
+  },
+  created () {
+    // 获取素材列表数据
+    this.getImages()
+  },
+  methods: {
+    // 分页功能
+    pager (newPage) {
+      this.reqParams.page = newPage
+      this.getImages()
+    },
+    search () {
+      this.reqParams.page = 1
+      this.getImages()
+    },
+    async getImages () {
+      this.loading = true
+      const { data: { data } } = await this.$http.get('user/images', { params: this.reqParams })
+      // 获取数据成功
+      this.images = data.results
+      // 设置总条数
+      this.total = data.total_count
+      this.loading = false
     }
   }
 }
