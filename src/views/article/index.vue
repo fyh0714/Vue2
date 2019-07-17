@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <my-channel @input="fn"></my-channel>
     <!-- 筛选区域 -->
     <el-card>
       <div slot="header">
@@ -18,14 +17,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="频道：">
-          <el-select v-model="reqParams.channel_id">
-            <el-option
-              v-for="item in channelOptions"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
+          <my-channel v-model="reqParams.channel_id"></my-channel>
         </el-form-item>
         <el-form-item label="日期：">
             <el-date-picker
@@ -107,8 +99,6 @@ export default {
         begin_pubdate: null,
         end_pubdate: null
       },
-      // 频道的选项数组
-      channelOptions: [{ name: 'java', id: '1' }],
       // 日期数据
       dataValues: [],
       // 文章列表数据
@@ -118,16 +108,10 @@ export default {
     }
   },
   created () {
-    // 获取频道数据
-    this.getChannelOptions()
     // 获取文章列表数据
     this.getArticles()
   },
   methods: {
-    fn (data) {
-      console.log('fn')
-      console.log(data)
-    },
     // 编辑
     edit (id) {
       this.$router.push(`/publish?id=${id}`)
@@ -163,14 +147,6 @@ export default {
     changeDate (values) {
       this.reqParams.begin_pubdate = values[0]
       this.reqParams.end_pubdate = values[1]
-    },
-    // 获取频道数据
-    async getChannelOptions () {
-      // res ==>{data:响应内容}==> {data:{data:{channels:[{id,name}]}}}
-      // 解构赋值 一层 const {data} = res
-      // 解构赋值 二层 const {data:{data:data}} = res
-      const { data: { data } } = await this.$http.get('channels')
-      this.channelOptions = data.channels
     },
     // 获取文章列表数据
     async getArticles () {
