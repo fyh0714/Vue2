@@ -69,8 +69,10 @@
         </el-table-column>
         <el-table-column label="发布时间" prop="pubdate"></el-table-column>
         <el-table-column label="操作" width="120">
+          <template slot-scope="scope">
           <el-button icon="el-icon-edit" type="primary" circle plain></el-button>
-          <el-button icon="el-icon-delete" type="danger" circle plain></el-button>
+          <el-button @click="del(scope.row.id)" icon="el-icon-delete" type="danger" circle plain></el-button>
+          </template>
         </el-table-column>
       </el-table>
       <div class="box">
@@ -121,7 +123,23 @@ export default {
     this.getArticles()
   },
   methods: {
-    // 分
+    // 删除
+    del (id) {
+      this.$confirm('亲,此操作将永久删除该文章, 是否继续?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          await this.$http.delete(`articles/${id}`)
+          // 删除成功
+          this.$message.success('删除成功')
+          // 更新列表
+          this.getArticles()
+        })
+        .catch(() => {})
+    },
+    // 分页
     pager (newpage) {
       // 提交当前页码给后台 才能获取对应的数据
       this.reqParams.page = newpage

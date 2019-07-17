@@ -8,7 +8,11 @@ const instance = axios.create({
   baseURL: 'http://ttapi.research.itcast.cn/mp/v1_0/',
   transformResponse: [(data) => {
     // 对data进行任意转换处理
-    return JSONBing.parse(data)
+    // data应该是 null 使用JSONBing转换null会出现异常
+    if (data) {
+      return JSONBing.parse(data)
+    }
+    return data
   }]
 //   headers: {
 //     Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('hm74-toutiao')).token
@@ -34,7 +38,7 @@ instance.interceptors.request.use(config => {
 
 // 响应拦截
 instance.interceptors.response.use(response => response, error => {
-  if (error.response.status === 401) {
+  if (error.response && error.response.status === 401) {
     location.hash = '#/login'
   }
   return Promise.reject(error)
