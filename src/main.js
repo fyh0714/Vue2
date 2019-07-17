@@ -14,6 +14,9 @@ import axios from '@/api/axios.js'
 
 import components from '@/components'
 
+// 导入全局样式
+import '@/styles/index.less'
+
 Vue.use(components)
 
 Vue.prototype.$http = axios

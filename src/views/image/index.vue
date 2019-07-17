@@ -11,7 +11,7 @@
           <el-radio-button :label="true">收藏</el-radio-button>
         </el-radio-group>
         <!-- 绿色按钮 -->
-        <el-button size="small" style="float:right" type="success">添加素材</el-button>
+        <el-button @click="dialogVisible=true" size="small" style="float:right" type="success">添加素材</el-button>
       </div>
       <!-- 图片列表 -->
       <ul class="img-list">
@@ -23,8 +23,33 @@
           </div>
         </li>
       </ul>
-      <el-pagination v-if="total>reqParams.per_page" background layout="prev, pager, next" :total="total" :page-size="reqParams.per_page" :current-page="reqParams.page" @current-change="pager"></el-pagination>
+      <el-pagination
+        v-if="total>reqParams.per_page"
+        background
+        layout="prev, pager, next"
+        :total="total"
+        :page-size="reqParams.per_page"
+        :current-page="reqParams.page"
+        @current-change="pager"
+      ></el-pagination>
     </el-card>
+    <!-- 对话框 -->
+    <el-dialog title="添加素材" :visible.sync="dialogVisible" width="300px">
+      <el-upload
+        class="avatar-uploader"
+        action="http://ttapi.research.itcast.cn/mp/v1_0/user/images"
+        :headers="headers"
+        :show-file-list="false"
+        :on-success="handleSuccess"
+        name="image"
+      >
+        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+      </el-upload>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">关 闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -43,7 +68,13 @@ export default {
       // 加载数据
       loading: false,
       // 总条数
-      total: 0
+      total: 0,
+      // 添加素材相关数据
+      dialogVisible: false,
+      imageUrl: null,
+      headers: {
+        Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('hm74-toutiao')).token
+      }
     }
   },
   created () {
@@ -51,6 +82,19 @@ export default {
     this.getImages()
   },
   methods: {
+    // 上传成功
+    handleSuccess (res) {
+      // 1.预览2秒钟，提示上传成功
+      this.imageUrl = res.data.url
+      this.$message.success('上传成功')
+      window.setTimeout(() => {
+        // 2.自动关闭对话框，更新数据列表
+        this.dialogVisible = false
+        this.getImages()
+        // 再次打开对话框的时候，预览的是上传按钮而不是之前的图片
+        this.imageUrl = null
+      }, 2000)
+    },
     // 分页功能
     pager (newPage) {
       this.reqParams.page = newPage
@@ -62,7 +106,9 @@ export default {
     },
     async getImages () {
       this.loading = true
-      const { data: { data } } = await this.$http.get('user/images', { params: this.reqParams })
+      const {
+        data: { data }
+      } = await this.$http.get('user/images', { params: this.reqParams })
       // 获取数据成功
       this.images = data.results
       // 设置总条数
