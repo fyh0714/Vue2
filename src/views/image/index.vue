@@ -18,8 +18,12 @@
         <li v-for="item in images" :key="item.id">
           <img :src="item.url" alt />
           <div class="fot" v-if="!reqParams.collect">
-            <span class="el-icon-star-off" :class="{red:item.is_collected}"></span>
-            <span class="el-icon-delete"></span>
+            <span
+              @click="toggleFav(item)"
+              class="el-icon-star-off"
+              :class="{red:item.is_collected}"
+            ></span>
+            <span @click="delImage(item.id)" class="el-icon-delete"></span>
           </div>
         </li>
       </ul>
@@ -73,7 +77,9 @@ export default {
       dialogVisible: false,
       imageUrl: null,
       headers: {
-        Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('hm74-toutiao')).token
+        Authorization:
+          'Bearer ' +
+          JSON.parse(window.sessionStorage.getItem('hm74-toutiao')).token
       }
     }
   },
@@ -82,6 +88,31 @@ export default {
     this.getImages()
   },
   methods: {
+    // 删除图片
+    delImage (id) {
+      this.$confirm('此操作将永久删除该图片, 是否继续?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          await this.$http.delete('user/images/' + id)
+          this.$message.success('删除成功')
+          this.getImages()
+        })
+        .catch(() => {})
+    },
+    // 切换收藏和取消收藏
+    async toggleFav (item) {
+      const {
+        data: { data }
+      } = await this.$http.put('user/images/' + item.id, {
+        collect: !item.is_collected
+      })
+      this.$message.success('操作成功')
+      // 把当前的图片的状态改成操作后后台给的状态
+      item.is_collected = data.collect
+    },
     // 上传成功
     handleSuccess (res) {
       // 1.预览2秒钟，提示上传成功
