@@ -12,6 +12,7 @@ import Welcome from '../views/welcome'
 import NotFound from '../views/404'
 
 import Article from '../views/article'
+
 Vue.use(VueRouter)
 
 const router = new VueRouter({
