@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <my-channel @input="fn"></my-channel>
     <!-- 筛选区域 -->
     <el-card>
       <div slot="header">
@@ -70,7 +71,7 @@
         <el-table-column label="发布时间" prop="pubdate"></el-table-column>
         <el-table-column label="操作" width="120">
           <template slot-scope="scope">
-          <el-button icon="el-icon-edit" type="primary" circle plain></el-button>
+          <el-button @click="edit(scope.row.id)" icon="el-icon-edit" type="primary" circle plain></el-button>
           <el-button @click="del(scope.row.id)" icon="el-icon-delete" type="danger" circle plain></el-button>
           </template>
         </el-table-column>
@@ -123,6 +124,14 @@ export default {
     this.getArticles()
   },
   methods: {
+    fn (data) {
+      console.log('fn')
+      console.log(data)
+    },
+    // 编辑
+    edit (id) {
+      this.$router.push(`/publish?id=${id}`)
+    },
     // 删除
     del (id) {
       this.$confirm('亲,此操作将永久删除该文章, 是否继续?', '温馨提示', {
