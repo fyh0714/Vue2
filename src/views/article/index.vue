@@ -45,7 +45,7 @@
     <!-- 结果区域 -->
     <el-card>
       <div slot="header">
-        根据筛选条件共查询到<b>0</b>条结果：
+        根据筛选条件共查询到<b>{{total}}</b>条结果：
       </div>
       <el-table :data="articles">
         <el-table-column label="封面">
@@ -77,7 +77,10 @@
       <el-pagination
         background
         layout="prev, pager, next"
-        :total="1000">
+        @current-change="pager"
+        :current-page="reqParams.page"
+        :page-size="reqParams.per_page"
+        :total="total">
       </el-pagination>
       </div>
     </el-card>
@@ -90,6 +93,10 @@ export default {
     return {
       // 提交给后台筛选条件的数据
       reqParams: {
+        // 页数
+        page: 1,
+        // 每页数量
+        per_page: 20,
         // 默认数据''与 null 区别
         // 如果是 null 该字段是不会提交给后台的
         status: null,
@@ -101,7 +108,10 @@ export default {
       channelOptions: [{ name: 'java', id: '1' }],
       // 日期数据
       dataValues: [],
-      articles: []
+      // 文章列表数据
+      articles: [],
+      // 总条数
+      total: 0
     }
   },
   created () {
@@ -111,8 +121,15 @@ export default {
     this.getArticles()
   },
   methods: {
+    // 分
+    pager (newpage) {
+      // 提交当前页码给后台 才能获取对应的数据
+      this.reqParams.page = newpage
+      this.getArticles()
+    },
     // 搜索
     search () {
+      this.reqParams.page = 1
       this.getArticles()
     },
     // 选择频道数据
@@ -134,6 +151,8 @@ export default {
       // get传参 get('url?key=value&.....') get('url',{params:{参数对象}})
       const { data: { data } } = await this.$http.get('articles', { params: this.reqParams })
       this.articles = data.results
+      // 获取总条数
+      this.total = data.total_count
     }
   }
 }
