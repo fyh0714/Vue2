@@ -1,15 +1,15 @@
 <template>
-  <div class="container">
+  <div class="article-container">
     <el-card>
       <div slot="header">
         <my-bread>发布文章</my-bread>
       </div>
-      <el-form :model="articleForm"  label-width="100px">
+      <el-form :model="articleForm" label-width="100px">
         <el-form-item label="标题">
           <el-input v-model="articleForm.title" style="width:400px"></el-input>
         </el-form-item>
         <el-form-item label="内容">
-          <quill-editor v-model="articleForm.content" style="hight:600px"></quill-editor>
+          <quill-editor v-model="articleForm.content" :options="editorOption"></quill-editor>
         </el-form-item>
         <el-form-item label="封面">
           <el-radio-group v-model="articleForm.cover.type">
@@ -18,7 +18,9 @@
             <el-radio :label="0">无图</el-radio>
             <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
-          <div class="img-btn"><img src="../../assets/images/default.png" alt=""></div>
+          <div class="img-btn">
+            <my-image></my-image>
+          </div>
         </el-form-item>
         <el-form-item label="频道">
           <my-channel v-model="articleForm.channel_id"></my-channel>
@@ -43,6 +45,20 @@ export default {
   },
   data () {
     return {
+      // 富文本编辑器的配置选择
+      editorOption: {
+        placeholder: '',
+        modules: {
+          toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ header: 1 }, { header: 2 }],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ indent: '-1' }, { indent: '+1' }]
+          ]
+        }
+      },
+      // 提交给后台的文章数据
       articleForm: {
         title: '',
         content: '',
@@ -57,7 +73,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-.img-btn{
+.img-btn {
   width: 150px;
   height: 150px;
   border: 1px dashed #ddd;
