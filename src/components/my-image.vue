@@ -19,7 +19,7 @@
             </el-radio-group>
           </div>
           <!-- 图片列表 -->
-          <div class="img-item" v-for="item in images " :key="item.id">
+          <div class="img-item" :class="{selected:selectedImageUrl===item.url}" @click="selectedImage(item.url)" v-for="item in images " :key="item.id">
             <img :src="item.url" alt />
           </div>
           <!-- 分页 -->
@@ -64,10 +64,20 @@ export default {
       // 素材列表数据
       images: [],
       // 总数量
-      total: 0
+      total: 0,
+      // 你选中素材的地址
+      selectedImageUrl: null
     }
   },
   methods: {
+    // 选中图片
+    selectedImage (url) {
+      // 思路：class={selected:条件}
+      // 条件 记录上一次点击图片的唯一标识 然后 去比对每一次遍历的图片唯一标识
+      // 如果一致 选中  不一致 不选中
+      // 此时图片地址做唯一标识
+      this.selectedImageUrl = url
+    },
     pager (newPage) {
       this.reqParams.page = newPage
       this.getImages()
@@ -98,6 +108,19 @@ export default {
   border: 1px dashed #ddd;
   display: inline-block;
   margin-right: 10px;
+  position: relative;
+  &.selected{
+    &::before {
+      //.img-item.selected::before{} 加上selelctedclass加遮罩层
+      content:"";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0,0.2) url(../assets/images/selected.png) no-repeat center / 50px 50px;
+    }
+  }
   img {
     width: 100%;
     height: 100%;
