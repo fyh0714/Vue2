@@ -2,7 +2,7 @@
   <div class="image-container">
     <div class="img-btn" @click="openDialog">
       <!-- 图片按钮 -->
-      <img :src="value" alt />
+      <img :src="value||dafaultImage" alt />
     </div>
     <!-- 对话框 -->
     <el-dialog :visible.sync="dialogVisible" width="700px">
@@ -81,9 +81,11 @@ export default {
       // 注意：webpack不会去打包在数据中定义的地址对应的资源,打包标签上的src或url的资源
       // 注意：本地的资源不会打包 网络资源会打包
       // 自己主动导入 你需要的图片
-      value: dafaultImage
+      // value: dafaultImage
+      dafaultImage
     }
   },
+  props: ['value'],
   methods: {
     // 确认图片
     confirmImage () {
@@ -91,10 +93,12 @@ export default {
       // 如果是素材 使用selectedImageUrl作为封面图
         if (!this.selectedImageUrl) return this.$message.warning('请选择素材')
         this.value = this.selectedImageUrl
+        this.$emit('input', this.selectedImageUrl)
       } else {
       // 如果是上传图片 使用uploadImageUrl 作为封面图
         if (!this.uploadImageUrl) return this.$message.warning('请上传图片')
         this.value = this.uploadImageUrl
+        this.$emit('input', this.uploadImageUrl)
       }
       this.dialogVisible = false
     },
@@ -138,6 +142,10 @@ export default {
 </script>
 
 <style scoped lang="less">
+.image-container {
+  display: inline-block;
+  margin-right: 20px;
+}
 .img-item {
   height: 120px;
   width: 150px;

@@ -12,14 +12,21 @@
           <quill-editor v-model="articleForm.content" :options="editorOption"></quill-editor>
         </el-form-item>
         <el-form-item label="封面">
-          <el-radio-group v-model="articleForm.cover.type">
+          <el-radio-group v-model="articleForm.cover.type" @change="changType">
             <el-radio :label="1">单图</el-radio>
             <el-radio :label="3">三图</el-radio>
             <el-radio :label="0">无图</el-radio>
             <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
-          <div class="img-btn">
-            <my-image></my-image>
+          <!-- 单图 -->
+          <div v-if="articleForm.cover.type === 1">
+            <my-image v-model="articleForm.cover.images[0]"></my-image>
+          </div>
+          <!-- 三图 -->
+          <div v-if="articleForm.cover.type === 3">
+            <my-image v-model="articleForm.cover.images[0]"></my-image>
+            <my-image v-model="articleForm.cover.images[1]"></my-image>
+            <my-image v-model="articleForm.cover.images[2]"></my-image>
           </div>
         </el-form-item>
         <el-form-item label="频道">
@@ -64,9 +71,16 @@ export default {
         content: '',
         cover: {
           type: 1,
+          // 数据长度 如果是单图为1 如果是三图为3
           images: []
         }
       }
+    }
+  },
+  methods: {
+    changType () {
+      // 重新选中图片类型 清空图片数据
+      this.articleForm.cover.images = []
     }
   }
 }
