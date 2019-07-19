@@ -2,7 +2,7 @@
   <div class="image-container">
     <div class="img-btn" @click="openDialog">
       <!-- 图片按钮 -->
-      <img src="../assets/images/default.png" alt />
+      <img :src="value" alt />
     </div>
     <!-- 对话框 -->
     <el-dialog :visible.sync="dialogVisible" width="700px">
@@ -28,8 +28,11 @@
         <el-tab-pane label="上传图片" name="upload">
           <el-upload
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="http://ttapi.research.itcast.cn/mp/v1_0/user/images"
             :show-file-list="false"
+            :headers="headers"
+            name="image"
+            :on-success="handleSuccess"
           >
             <img v-if="uploadImageUrl" :src="uploadImageUrl" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -38,17 +41,24 @@
       </el-tabs>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="confirmImage()">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import dafaultImage from '../assets/images/default.png'
 export default {
   name: 'my-image',
   data () {
     return {
+      // 头部数据
+      headers: {
+        Authorization:
+          'Bearer ' +
+          JSON.parse(window.sessionStorage.getItem('hm74-toutiao')).token
+      },
       // 控制对话框显示和隐藏
       dialogVisible: false,
       // 控制选中的选项卡
@@ -66,10 +76,33 @@ export default {
       // 总数量
       total: 0,
       // 你选中素材的地址
-      selectedImageUrl: null
+      selectedImageUrl: null,
+      // 你选中的图片
+      // 注意：webpack不会去打包在数据中定义的地址对应的资源,打包标签上的src或url的资源
+      // 注意：本地的资源不会打包 网络资源会打包
+      // 自己主动导入 你需要的图片
+      value: dafaultImage
     }
   },
   methods: {
+    // 确认图片
+    confirmImage () {
+      if (this.activeName === 'image') {
+      // 如果是素材 使用selectedImageUrl作为封面图
+        if (!this.selectedImageUrl) return this.$message.warning('请选择素材')
+        this.value = this.selectedImageUrl
+      } else {
+      // 如果是上传图片 使用uploadImageUrl 作为封面图
+        if (!this.uploadImageUrl) return this.$message.warning('请上传图片')
+        this.value = this.uploadImageUrl
+      }
+      this.dialogVisible = false
+    },
+    // 上传成功
+    handleSuccess (res) {
+      // 预览
+      this.uploadImageUrl = res.data.url
+    },
     // 选中图片
     selectedImage (url) {
       // 思路：class={selected:条件}
@@ -87,6 +120,9 @@ export default {
       this.getImages()
     },
     openDialog () {
+      // 清除上一次数据
+      this.selectedImageUrl = null
+      this.uploadImageUrl = null
       this.reqParams.page = 1
       this.dialogVisible = true
       // 渲染素材列表
