@@ -33,8 +33,8 @@
           <my-channel v-model="articleForm.channel_id"></my-channel>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">发表</el-button>
-          <el-button>存入草稿</el-button>
+          <el-button type="primary" @click="publish(false)">发表</el-button>
+          <el-button @click="publish(true)">存入草稿</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -73,7 +73,8 @@ export default {
           type: 1,
           // 数据长度 如果是单图为1 如果是三图为3
           images: []
-        }
+        },
+        channel_id: null
       }
     }
   },
@@ -81,6 +82,12 @@ export default {
     changType () {
       // 重新选中图片类型 清空图片数据
       this.articleForm.cover.images = []
+    },
+    // 发表存入操作
+    async publish (draft) {
+      await this.$http.post(`articles?draft=${draft}`, this.articleForm)
+      this.$message.success(!draft ? '发表成功' : '存入草稿成功')
+      this.$router.push('/article')
     }
   }
 }
