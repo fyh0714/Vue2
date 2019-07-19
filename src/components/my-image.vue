@@ -85,19 +85,20 @@ export default {
       dafaultImage
     }
   },
-  props: ['value'],
+  props: ['value'], // 只读
   methods: {
     // 确认图片
     confirmImage () {
       if (this.activeName === 'image') {
       // 如果是素材 使用selectedImageUrl作为封面图
         if (!this.selectedImageUrl) return this.$message.warning('请选择素材')
-        this.value = this.selectedImageUrl
+        // 不能修改props中的value值
+        // this.value = this.selectedImageUrl
         this.$emit('input', this.selectedImageUrl)
       } else {
       // 如果是上传图片 使用uploadImageUrl 作为封面图
         if (!this.uploadImageUrl) return this.$message.warning('请上传图片')
-        this.value = this.uploadImageUrl
+        // this.value = this.uploadImageUrl
         this.$emit('input', this.uploadImageUrl)
       }
       this.dialogVisible = false

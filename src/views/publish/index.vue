@@ -2,7 +2,7 @@
   <div class="article-container">
     <el-card>
       <div slot="header">
-        <my-bread>发布文章</my-bread>
+        <my-bread>{{articleId?'修改':'发布'}}文章</my-bread>
       </div>
       <el-form :model="articleForm" label-width="100px">
         <el-form-item label="标题">
@@ -32,9 +32,13 @@
         <el-form-item label="频道">
           <my-channel v-model="articleForm.channel_id"></my-channel>
         </el-form-item>
-        <el-form-item>
+        <el-form-item v-if="!articleId">
           <el-button type="primary" @click="publish(false)">发表</el-button>
           <el-button @click="publish(true)">存入草稿</el-button>
+        </el-form-item>
+        <el-form-item v-else>
+          <el-button type="primary" @click="edit(false)">修改</el-button>
+          <el-button @click="edit(true)">存入草稿</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -75,10 +79,41 @@ export default {
           images: []
         },
         channel_id: null
+      },
+      // 修改文章的ID
+      articleId: null
+    }
+  },
+  created () {
+    this.articleId = this.$route.query.id
+    // 可能拿不到 当你是发布时拿不到
+    // 获取文章数据
+    if (this.articleId) {
+      this.getArticle()
+    }
+  },
+  watch: {
+    $route () {
+      // 监听一种 有修改切换到发布
+      this.articleId = null
+      this.articleForm = {
+        title: '',
+        content: '',
+        cover: {
+          type: 1,
+          // 数据长度 如果是单图为1 如果是三图为3
+          images: []
+        },
+        channel_id: null
       }
     }
   },
   methods: {
+    // 获取文章数据
+    async getArticle () {
+      const { data: { data } } = await this.$http.get('articles/' + this.articleId)
+      this.articleForm = data
+    },
     changType () {
       // 重新选中图片类型 清空图片数据
       this.articleForm.cover.images = []
@@ -87,6 +122,12 @@ export default {
     async publish (draft) {
       await this.$http.post(`articles?draft=${draft}`, this.articleForm)
       this.$message.success(!draft ? '发表成功' : '存入草稿成功')
+      this.$router.push('/article')
+    },
+    // 修改文章
+    async edit (draft) {
+      await this.$http.put(`articles/${this.articleId}?draft=${draft}`, this.articleForm)
+      this.$message.success(!draft ? '修改成功' : '修改草稿成功')
       this.$router.push('/article')
     }
   }
