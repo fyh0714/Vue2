@@ -60,6 +60,7 @@
         </el-dropdown>
       </el-header>
       <el-main>
+        <!-- 二级路由显示的位置 -->
         <router-view></router-view>
       </el-main>
     </el-container>
