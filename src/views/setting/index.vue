@@ -20,7 +20,7 @@
               <el-input v-model="userForm.email"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary">保存设置</el-button>
+              <el-button type="primary" @click="updateUserInfo">保存设置</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import eventBus from '@/eventBus'
 export default {
   data () {
     return {
@@ -52,13 +53,28 @@ export default {
     }
   },
   created () {
-    // 获取用户信息
     this.getUserInfo()
   },
   methods: {
+    // 获取用户信息
     async getUserInfo () {
       const { data: { data } } = await this.$http.get('user/profile')
       this.userForm = data
+    },
+    // 修改用户信息
+    async updateUserInfo () {
+      const { data: { data } } = await this.$http.patch('user/profile', {
+        name: this.userForm.name,
+        intro: this.userForm.intro,
+        email: this.userForm.email
+      })
+      this.$message.success('修改用户信息成功')
+      // 传当前修改的用户名称给hom组件修改home组件的数据 用户名称
+      eventBus.$emit('updateHeaderName', data.name)
+      // 更新本地存储的用户名称
+      const userInfo = JSON.parse(window.sessionStorage.getItem('hm74-toutiao'))
+      userInfo.name = data.name
+      window.sessionStorage.setItem('hm74-toutiao', JSON.stringify(userInfo))
     }
   }
 }
