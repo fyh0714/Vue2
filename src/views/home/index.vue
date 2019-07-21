@@ -86,6 +86,9 @@ export default {
     eventBus.$on('updateHeaderName', (name) => {
       this.name = name
     })
+    eventBus.$on('updateHeaderPhoto', (url) => {
+      this.avatar = url
+    })
   },
   methods: {
     toggleMenu () {

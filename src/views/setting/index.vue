@@ -26,7 +26,11 @@
         </el-col>
         <el-col :span="12">
           <!-- 上传头像-->
-          <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/" :show-file-list="false">
+          <el-upload
+          class="avatar-uploader"
+          action=""
+          :http-request="myUpload"
+          :show-file-list="false">
               <img v-if="userForm.photo" :src="userForm.photo" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
@@ -42,6 +46,11 @@ import eventBus from '@/eventBus'
 export default {
   data () {
     return {
+      headers: {
+        Authorization:
+          'Bearer ' +
+          JSON.parse(window.sessionStorage.getItem('hm74-toutiao')).token
+      },
       userForm: {
         name: null,
         intro: null,
@@ -56,6 +65,33 @@ export default {
     this.getUserInfo()
   },
   methods: {
+    myUpload (data) {
+      // 阿里百秀 自己来上传图片，使用xhr配合formData进行图片上传
+      // 现在 自己来上传图片，使用axios配合formData进行图片上传
+      // 获取图片对象 data.file 获取
+      const formData = new FormData()
+      formData.append('photo', data.file)
+      this.$http.patch('user/photo', formData).then(res => {
+        // 修改头像成功 res.data.data.photo 地址
+        const url = res.data.data.photo
+        this.$message.success('修改头像成功')
+        this.userForm.photo = url
+        // 1.更新home组件的头像
+        eventBus.$emit('updateHeaderPhoto', url)
+        // 2.更新本地存储的头像
+        const userInfo = JSON.parse(window.sessionStorage.getItem('hm74-toutiao'))
+        userInfo.photo = url
+        window.sessionStorage.setItem('hm74-toutiao', JSON.stringify(userInfo))
+      })
+    },
+    // handleSuccess (res) {
+    //   // res.data.photo 修改后的新头像
+    //   // 出现错误：METHOD NOT ALLOWED
+    //   // 请求方式不允许
+    //   // el-upload发送请求类型默认是post 只能是post
+    //   // http-request 配置一个函数 会覆盖默认上传行为 自己来上传图片
+    //   console.log(res.data.photo)
+    // },
     // 获取用户信息
     async getUserInfo () {
       const { data: { data } } = await this.$http.get('user/profile')
